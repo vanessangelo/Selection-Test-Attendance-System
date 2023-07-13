@@ -17,6 +17,7 @@ app.use(express.json());
 
 app.use("/api/auth", router.auth);
 app.use("/api/admin", router.admin);
+app.use("/api/staff", router.staff);
 
 app.get("/api", (req, res) => {
   res.send(`Hello, this is my API`);

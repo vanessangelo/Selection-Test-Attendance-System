@@ -84,4 +84,43 @@ module.exports = {
       .isNumeric()
       .withMessage("Salary must be a numeric value"),
   ]),
+
+  validateSetAccount: validate([
+    body("full_name").optional(),
+    body("birth_date")
+      .optional()
+      .isDate()
+      .withMessage("Invalid date format")
+      .custom((value, { req }) => {
+        const currentDate = new Date();
+        const selectedDate = new Date(value);
+        if (selectedDate > currentDate) {
+          throw new Error("Birth date cannot be in the future");
+        }
+        return true;
+      }),
+    body("password")
+      .notEmpty()
+      .withMessage("Password is required")
+      .isStrongPassword({
+        minLength: 8,
+        minUppercase: 1,
+        minSymbols: 1,
+        minNumbers: 1,
+      })
+      .withMessage(
+        "Password required minimal 8 characters, 1 uppercase, 1 symbol, and 1 number"
+      )
+      .custom((value, { req }) => {
+        if (value !== req.body.confirm_password) {
+          throw new Error("Confirm password does not match with password");
+        }
+        return true;
+      }),
+    body("confirm_password")
+      .notEmpty()
+      .withMessage("Confirm password is required")
+      .isLength({ min: 8 })
+      .withMessage("Minimum password length is 8 characters"),
+  ]),
 };
