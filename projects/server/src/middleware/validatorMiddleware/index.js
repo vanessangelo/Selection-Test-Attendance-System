@@ -92,10 +92,12 @@ module.exports = {
       .isDate()
       .withMessage("Invalid date format")
       .custom((value, { req }) => {
-        const currentDate = new Date();
-        const selectedDate = new Date(value);
-        if (selectedDate > currentDate) {
-          throw new Error("Birth date cannot be in the future");
+        if (value) {
+          const currentDate = new Date();
+          const selectedDate = new Date(value);
+          if (selectedDate > currentDate) {
+            throw new Error("Birth date cannot be in the future");
+          }
         }
         return true;
       }),

@@ -15,6 +15,18 @@ module.exports = {
 
       const access_token = crypto.randomBytes(20).toString("hex");
 
+      const existingStaff = await db.User.findOne({
+        where: { email },
+        transaction,
+      });
+
+      if (existingStaff) {
+        await transaction.rollback();
+        return res.status(400).send({
+          message: "Credentials already registered",
+        });
+      }
+
       const newSalary = await db.Salary.create(
         { basic_salary },
         { transaction }
@@ -56,7 +68,7 @@ module.exports = {
         if (error) {
           return res.status(500).json({ error: "Error sending email" });
         } else {
-          res.status(200).send({
+          res.status(201).send({
             message: "Staff registered successfully. Email has been sent",
             email: newStaff.email,
             full_name: newStaff.full_name,
@@ -67,6 +79,10 @@ module.exports = {
       });
     } catch (error) {
       console.log(error.message);
+      if (error.message === "Validation error") {
+        const validationError = error.errors[0].message;
+        return res.status(400).send({ message: validationError });
+      }
       res
         .status(500)
         .send({ message: "Fatal error on server.", error: error.errors });

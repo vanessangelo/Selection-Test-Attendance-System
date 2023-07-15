@@ -1,28 +1,49 @@
-import axios from "axios";
-import logo from "./logo.svg";
 import "./App.css";
 import { useEffect, useState } from "react";
+import PrivateWrapper from "./wrapper/PrivateWrapper";
+import PublicWrapper from "./wrapper/PublicWrapper";
+import { useDispatch } from "react-redux";
+import { keep } from "./store/reducer/authSlice";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Home from "./page/Home";
+import LogIn from "./page/LogIn";
+import Profile from "./page/Profile";
+import RegisterUser from "./page/admin/RegisterStaff";
+import SetAccount from "./page/staff/SetAccount";
+import LiveAttendance from "./page/staff/LiveAttendance";
 
 function App() {
-  const [message, setMessage] = useState("");
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    (async () => {
-      const { data } = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/greetings`
-      );
-      setMessage(data?.message || "");
-    })();
-  }, []);
+    if (localStorage.getItem("token")) {
+      dispatch(keep(localStorage.getItem("token")));
+    }
+  }, [dispatch])
 
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        {message}
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        {/* public */}
+        <Route element={<PublicWrapper />}>
+          <Route path="/login" element={<LogIn />} />
+        </Route>
+        <Route path="/staff/setup/:token" element={<SetAccount />} />
+
+        {/* private */}
+        <Route path="/profile" element={<Profile />} />
+
+        {/* private and admin */}
+        <Route element={<PrivateWrapper />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/register-staff" element={<RegisterUser />} />
+        </Route>
+
+        {/* private and staff */}
+        <Route path="/live-attendance" element={<LiveAttendance />} />
+      </Routes>
+    </Router>
   );
 }
 

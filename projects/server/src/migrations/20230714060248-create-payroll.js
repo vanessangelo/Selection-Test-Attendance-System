@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Attendances", {
+    await queryInterface.createTable("Payrolls", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -19,20 +19,21 @@ module.exports = {
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },
-      clock_in: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      clock_out: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      date: {
-        type: Sequelize.DATE,
+      month: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      state: {
-        type: Sequelize.ENUM("absence", "halfday", "fullday"),
+      year: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      total_amount: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      deduction: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
         allowNull: false,
       },
       createdAt: {
@@ -46,6 +47,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Attendances");
+    await queryInterface.dropTable("Payrolls");
   },
 };

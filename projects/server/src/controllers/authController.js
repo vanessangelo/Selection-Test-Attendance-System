@@ -8,7 +8,7 @@ module.exports = {
       const { email, password } = req.body;
 
       const user = await db.User.findOne({
-        where: { email },
+        where: { email, access_token: "" },
       });
 
       if (!user) {
@@ -23,6 +23,75 @@ module.exports = {
       } else {
         return res.status(401).send({ message: "Invalid credential" });
       }
+    } catch (error) {
+      console.log(error.message);
+      res
+        .status(500)
+        .send({ message: "Fatal error on server.", error: error.message });
+    }
+  },
+
+  async getUserById(req, res) {
+    try {
+      const userProfile = await db.User.findOne({
+        where: {
+          id: req.user.id,
+        },
+        attributes: { exclude: ["password"] },
+        include: [
+          {
+            model: db.Role,
+          },
+          {
+            model: db.Salary,
+          },
+        ],
+      });
+
+      if (!userProfile) {
+        return res.status(400).send({
+          message: "User profile not found",
+        });
+      }
+
+      return res.status(200).send({
+        message: "Successfully retrieved user profile",
+        data: userProfile,
+      });
+    } catch (error) {
+      console.log(error.message);
+      res
+        .status(500)
+        .send({ message: "Fatal error on server.", error: error.message });
+    }
+  },
+  async getStaffByAcessToken(req, res) {
+    try {
+      const userProfile = await db.User.findOne({
+        where: {
+          access_token: req.query.token,
+        },
+        attributes: { exclude: ["password"] },
+        include: [
+          {
+            model: db.Role,
+          },
+          {
+            model: db.Salary,
+          },
+        ],
+      });
+
+      if (!userProfile) {
+        return res.status(400).send({
+          message: "User profile not found",
+        });
+      }
+
+      return res.status(200).send({
+        message: "Successfully retrieved user profile",
+        data: userProfile,
+      });
     } catch (error) {
       console.log(error.message);
       res
