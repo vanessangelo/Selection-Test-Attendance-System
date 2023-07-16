@@ -45,6 +45,11 @@ export default function LiveAttendance() {
         try {
             const response = await axios.get("http://localhost:8000/api/staff/attendance", { headers: { Authorization: `Bearer ${token}` } });
             setAttendanceRecords(response.data.data);
+
+            const isClockedInToday = response.data.data && response.data.data.clock_in;
+            const isClockedOutToday = response.data.data && response.data.data.clock_out;
+            setIsClockedIn(isClockedInToday);
+            setIsClockedOut(isClockedOutToday);
         } catch (error) {
             console.error(error.message);
         }
@@ -62,6 +67,7 @@ export default function LiveAttendance() {
             .then(response => {
                 console.log(response.data);
                 setIsClockedIn(true);
+                fetchAttendanceRecords();
             })
             .catch(error => {
                 console.error(error);

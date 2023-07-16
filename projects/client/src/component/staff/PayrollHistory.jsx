@@ -6,7 +6,6 @@ export default function PayrollHistoryStaff() {
     const token = useSelector((state) => state.auth.token)
 
     const [payrollData, setPayrollData] = useState([]);
-    const [msg, setMsg] = useState("")
     const [filter, setFilter] = useState({
         year: new Date().getFullYear(),
         month: new Date().getMonth() + 1,
