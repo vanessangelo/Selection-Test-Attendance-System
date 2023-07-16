@@ -4,16 +4,14 @@ const isToday = require("dayjs/plugin/isToday");
 const db = require("../../models");
 dayjs.extend(isToday);
 
-// const isBusinessDay = (date) => {
-//     // Returns true if the day is Monday - Friday (0 = Sunday, 6 = Saturday)
-//     return date.day() > 0 && date.day() < 6;
-// }
+const isBusinessDay = (date) => {
+  return date.day() > 0 && date.day() < 6;
+};
 
-const attendance = schedule.scheduleJob("* * * * *", async () => {
-  // Only run this job on business days
-  // if (!isBusinessDay(dayjs())) {
-  //     return;
-  // }
+const attendance = schedule.scheduleJob("0 23 * * *", async () => {
+  if (!isBusinessDay(dayjs())) {
+    return;
+  }
 
   const users = await db.User.findAll({
     where: {

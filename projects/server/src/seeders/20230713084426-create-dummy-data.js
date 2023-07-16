@@ -35,6 +35,18 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          email: "mockstaff@gmail.com",
+          full_name: "mockstaff",
+          birth_date: "1999-01-01",
+          join_date: "2023-01-01",
+          password: pw,
+          access_token: "",
+          role_id: 2,
+          salary_id: 2,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );
@@ -47,5 +59,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
+    await queryInterface.bulkDelete("Users", null, {});
   },
 };

@@ -13,19 +13,19 @@ const adminRoutes = [
 const staffRoutes = [
     { to: "/profile", icon: HiUser, name: "Profile" },
     { to: "/live-attendance", icon: HiClock, name: "Live Attendance" },
-    { to: "/my-attendance", icon: HiCalendar, name: "My Attendance" },
+    { to: "/my-attendances", icon: HiCalendar, name: "My Attendance" },
     { to: "/my-payroll", icon: HiCreditCard, name: "My Payroll" }
 ]
 
-export default function Sidebar() {
-    const dummyRole = "staff"
-    const role = "admin"
+export default function Sidebar(props) {
+    const user_id = props.userRole
+    const role_id = 1
 
     const location = useLocation();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const routes = role === dummyRole ? adminRoutes : staffRoutes;
+    const routes = role_id === user_id ? adminRoutes : staffRoutes;
 
     const handleLogout = () => {
         localStorage.removeItem("token");

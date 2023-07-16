@@ -9,18 +9,39 @@ router.patch(
   staffController.setStaffAccount
 );
 
-router.post("/clock-in", authMiddleware.verifyToken, staffController.clockIn);
+router.post(
+  "/clock-in",
+  authMiddleware.verifyToken,
+  authMiddleware.verifyStaff,
+  staffController.clockIn
+);
 
 router.patch(
   "/clock-out",
   authMiddleware.verifyToken,
+  authMiddleware.verifyStaff,
   staffController.clockOut
 );
 
 router.get(
   "/attendance",
   authMiddleware.verifyToken,
+  authMiddleware.verifyStaff,
   staffController.getAttendancePerDay
+);
+
+router.get(
+  "/my-attendances",
+  authMiddleware.verifyToken,
+  authMiddleware.verifyStaff,
+  staffController.getAttendanceLog
+);
+
+router.get(
+  "/my-payroll",
+  authMiddleware.verifyToken,
+  authMiddleware.verifyStaff,
+  staffController.getStaffPayroll
 );
 
 module.exports = router;

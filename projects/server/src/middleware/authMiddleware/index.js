@@ -1,10 +1,7 @@
 const jwt = require("jsonwebtoken");
-const secretKey = process.env.JWT_SECRET_KEY;
 
 module.exports = {
-  // authentication
   async verifyToken(req, res, next) {
-    // check token valid or not
     const { authorization } = req.headers;
     if (!authorization) {
       res.status(401).send({
@@ -34,9 +31,19 @@ module.exports = {
     }
   },
 
-  // authorization
   async verifyAdmin(req, res, next) {
+    console.log(req.user.role_id);
     if (req.user.role_id === 1) {
+      return next();
+    }
+    res.status(401).send({
+      message: "role is not allowed to access",
+    });
+  },
+
+  async verifyStaff(req, res, next) {
+    console.log(req.user.role_id);
+    if (req.user.role_id === 2) {
       return next();
     }
     res.status(401).send({

@@ -43,6 +43,15 @@ module.exports = {
 
   async clockIn(req, res) {
     try {
+      const today = dayjs();
+      const isWeekday = today.day() > 0 && today.day() < 6;
+
+      if (!isWeekday) {
+        return res
+          .status(400)
+          .send({ message: "Staff can only clock in on weekdays" });
+      }
+
       const user = await db.Attendance.findOne({
         where: {
           user_id: req.user.id,
@@ -77,6 +86,15 @@ module.exports = {
 
   async clockOut(req, res) {
     try {
+      const today = dayjs();
+      const isWeekday = today.day() > 0 && today.day() < 6;
+
+      if (!isWeekday) {
+        return res
+          .status(400)
+          .send({ message: "Staff can only clock in on weekdays" });
+      }
+
       const user = await db.Attendance.findOne({
         where: {
           user_id: req.user.id,
@@ -128,6 +146,91 @@ module.exports = {
       res
         .status(200)
         .send({ message: "Sucessfully retrieved data", data: user });
+    } catch (error) {
+      console.log(error.message);
+      res
+        .status(500)
+        .send({ message: "Fatal error on server.", error: error.errors });
+    }
+  },
+
+  async getAttendanceLog(req, res) {
+    const year = dayjs().year();
+    const month = dayjs().month() + 1;
+    const filters = {
+      year: Number(req.query.year) || year,
+      month: Number(req.query.month) || month,
+      state: req.query.state
+        ? req.query.state.split(",")
+        : ["absence", "halfday", "fullday"],
+      sort: req.query.sort || "DESC",
+    };
+    try {
+      const start = dayjs(`${filters.year}-${filters.month}-01`);
+      const end = start.endOf("month");
+
+      const attendanceLogs = await db.Attendance.findAndCountAll({
+        where: {
+          user_id: req.user.id,
+          date: {
+            [db.Sequelize.Op.between]: [start.toDate(), end.toDate()],
+          },
+          state: {
+            [db.Sequelize.Op.in]: filters.state,
+          },
+        },
+        order: [["date", filters.sort]],
+      });
+
+      res.status(200).send({
+        message: "Successfully retrieved attendance history",
+        filters,
+        data: attendanceLogs.rows.map((log) => ({
+          date: log.date,
+          clock_in: log.clock_in,
+          clock_out: log.clock_out,
+          state: log.state,
+        })),
+      });
+    } catch (error) {
+      console.log(error.message);
+      res
+        .status(500)
+        .send({ message: "Fatal error on server.", error: error.errors });
+    }
+  },
+
+  async getStaffPayroll(req, res) {
+    const { year, month, sort } = req.query;
+
+    let where = {
+      user_id: req.user.id,
+      year: year || "",
+      month: month || "",
+    };
+
+    try {
+      const payrollHistory = await db.Payroll.findOne({
+        where,
+        include: [
+          {
+            model: db.User,
+            include: [
+              {
+                model: db.Salary,
+                attributes: ["basic_salary"],
+              },
+            ],
+            attributes: [],
+          },
+        ],
+        attributes: ["year", "month", "total_amount", "deduction"],
+        raw: true,
+      });
+
+      return res
+        .status(200)
+        .send({ message: "Successfully retrieved data", data: payrollHistory });
     } catch (error) {
       console.log(error.message);
       res

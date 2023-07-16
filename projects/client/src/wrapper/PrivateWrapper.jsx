@@ -1,6 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 
-
 const PrivateWrapper = () => {
     const location = useLocation()
     const token = localStorage.getItem("token");

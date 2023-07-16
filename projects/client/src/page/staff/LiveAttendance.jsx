@@ -5,10 +5,9 @@ import Navbar from "../../component/Navbar";
 import Footer from "../../component/Footer";
 import axios from 'axios';
 import { useSelector } from "react-redux";
+import Welcoming from "../../component/Welcoming";
 
 export default function LiveAttendance() {
-    const fullName = "John Doe"; // Replace with user's full name
-
     const [currentTime, setCurrentTime] = useState(dayjs());
     const [greeting, setGreeting] = useState("");
 
@@ -42,15 +41,16 @@ export default function LiveAttendance() {
     const [isClockedOut, setIsClockedOut] = useState(false);
     const [isWeekday, setIsWeekday] = useState(false);
 
+    const fetchAttendanceRecords = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/api/staff/attendance", { headers: { Authorization: `Bearer ${token}` } });
+            setAttendanceRecords(response.data.data);
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
     useEffect(() => {
-        const fetchAttendanceRecords = async () => {
-            try {
-                const response = await axios.get("http://localhost:8000/api/staff/attendance", { headers: { Authorization: `Bearer ${token}` } });
-                setAttendanceRecords(response.data.data);
-            } catch (error) {
-                console.error(error.message);
-            }
-        };
         const currentDay = currentTime.day();
         const isWeekday = currentDay >= 1 && currentDay <= 5;
         setIsWeekday(isWeekday);
@@ -73,6 +73,7 @@ export default function LiveAttendance() {
             .then(response => {
                 console.log(response.data);
                 setIsClockedOut(true);
+                fetchAttendanceRecords();
             })
             .catch(error => {
                 console.error(error);
@@ -85,20 +86,15 @@ export default function LiveAttendance() {
                 <div className="h-15 w-full grid justify-center sticky top-0 z-50 bg-white shadow-md">
                     <Navbar />
                 </div>
-                <div className="grid grid-flow-col grid-rows-4 gap-4 p-4 min-h-full">
+                <div className="grid grid-flow-col grid-rows-5 gap-4 p-4 min-h-full">
                     <div className="col-span-4 bg-white shadow-md">
-                        <h1 className="text-xl font-bold px-4 py-2">{greeting}!</h1>
-                        <p className="px-4 py-3 font-mont">
-                            Hi, {fullName}!
-                            <br />
-                            It's {currentTime.format("dddd, DD MMMM YYYY")}
-                        </p>
+                        <Welcoming greeting={greeting} currentTime={currentTime.format("dddd, DD MMMM YYYY")} />
                     </div>
-                    <div className="row-span-3 col-span-4 flex gap-4">
-                        <div className="basis-1/4 bg-white shadow-md p-4 grid">
+                    <div className="row-span-4 col-span-4 flex gap-4">
+                        <div className="basis-1/6 bg-white shadow-md p-4 grid">
                             <Sidebar />
                         </div>
-                        <div className="basis-3/4 bg-white shadow-md p-4">
+                        <div className="basis-5/6 bg-white shadow-md p-4">
                             <div className="flex flex-col p-4 h-full w-full justify-center gap-4">
                                 <div className="basis-1/2 grid shadow-md">
                                     <div className="row-span-2 grid text-center p-2">
@@ -110,13 +106,13 @@ export default function LiveAttendance() {
                                         </div>
                                     </div>
                                     <div className="row-span-1 text-center p-2 flex flex-col sm:flex-row justify-center">
-                                        <div className="px-2">
+                                        <div className="px-2 text-sm sm:text-base">
                                             <button className={`bg-gray-200 font-bold py-2 px-4 rounded ${(isClockedIn || isClockedOut || !isWeekday) ? "text-gray-500 hover:bg-none" : "hover:bg-purplee"}`} onClick={handleClockIn} disabled={isClockedIn || isClockedOut || !isWeekday}>
                                                 Clock In
                                             </button>
                                         </div>
-                                        <div className="px-2">
-                                            <button className={`bg-gray-200 font-bold py-2 px-4 rounded ${(!isClockedIn || isClockedOut || !isWeekday) ? "text-gray-500 hover:bg-none" : "hover:bg-purplee"}`} onClick={handleClockOut} disabled={!isClockedIn || isClockedOut || !isWeekday}>
+                                        <div className="px-2 text-sm sm:text-base">
+                                            <button className={`bg-gray-200 font-bold py-2 px-4  mt-2 sm:mt-0 rounded ${(!isClockedIn || isClockedOut || !isWeekday) ? "text-gray-500 hover:bg-none" : "hover:bg-purplee"}`} onClick={handleClockOut} disabled={!isClockedIn || isClockedOut || !isWeekday}>
                                                 Clock Out
                                             </button>
                                         </div>

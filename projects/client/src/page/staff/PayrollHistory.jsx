@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
+import Footer from "../../component/Footer";
+import Navbar from "../../component/Navbar";
 import dayjs from "dayjs";
-import Sidebar from "../component/Sidebar";
-import Navbar from "../component/Navbar";
-import Footer from "../component/Footer";
-import UserProfile from "../component/UserProfile";
-import axios from "axios";
+import Sidebar from "../../component/Sidebar";
+import Welcoming from "../../component/Welcoming";
 import { useSelector } from "react-redux";
-import Welcoming from "../component/Welcoming";
+import axios from "axios";
+import PayrollHistoryStaff from "../../component/staff/PayrollHistory";
 
-export default function Profile() {
+export default function Payroll() {
     const [currentTime, setCurrentTime] = useState(dayjs());
     const [greeting, setGreeting] = useState("");
 
@@ -55,7 +55,6 @@ export default function Profile() {
             fetchUserData(token);
         }
     }, [token]);
-
     return (
         <>
             <div className="min-h-full bg-gray-200">
@@ -72,7 +71,7 @@ export default function Profile() {
                         </div>
                         <div className="basis-5/6 bg-white shadow-md">
                             <div className="grid p-4 h-full">
-                                <UserProfile />
+                                <PayrollHistoryStaff />
                             </div>
                         </div>
                     </div>
@@ -82,5 +81,6 @@ export default function Profile() {
                 </div>
             </div>
         </>
-    )
+    );
 }
+

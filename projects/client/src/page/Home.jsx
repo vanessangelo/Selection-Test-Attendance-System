@@ -3,10 +3,11 @@ import Footer from "../component/Footer";
 import Navbar from "../component/Navbar";
 import dayjs from "dayjs";
 import Sidebar from "../component/Sidebar";
+import Welcoming from "../component/Welcoming";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 export default function Home() {
-    const fullName = "John Doe"; // Replace with user's full name
-
     const [currentTime, setCurrentTime] = useState(dayjs());
     const [greeting, setGreeting] = useState("");
 
@@ -33,26 +34,41 @@ export default function Home() {
         setGreeting(text);
     }, [currentTime]);
 
+    const [userData, setUserData] = useState([]);
+    const token = useSelector((state) => state.auth.token)
+
+    const fetchUserData = async (token) => {
+        try {
+            const response = await axios.get("http://localhost:8000/api/auth/profile", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const user = response.data.data;
+            setUserData(user);
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
+
+    useEffect(() => {
+        if (token) {
+            fetchUserData(token);
+        }
+    }, [token]);
     return (
         <>
             <div className="min-h-full bg-gray-200">
                 <div className="h-15 w-full grid justify-center sticky top-0 z-50 bg-white shadow-md">
                     <Navbar />
                 </div>
-                <div className="grid grid-flow-col grid-rows-4 gap-4 p-4 min-h-full">
+                <div className="grid grid-flow-col grid-rows-5 gap-4 p-4 min-h-full">
                     <div className="col-span-4 bg-white shadow-md">
-                        <h1 className="text-xl font-bold px-4 py-2">{greeting}!</h1>
-                        <p className="px-4 py-3 font-mont">
-                            Hi, {fullName}!
-                            <br />
-                            It's {currentTime.format("dddd, DD MMMM YYYY")}
-                        </p>
+                        <Welcoming greeting={greeting} currentTime={currentTime.format("dddd, DD MMMM YYYY")} />
                     </div>
-                    <div className="row-span-3 col-span-4 flex gap-4">
-                        <div className="basis-1/4 bg-white shadow-md p-4 grid">
-                            <Sidebar />
+                    <div className="row-span-4 col-span-4 flex gap-4">
+                        <div className="basis-1/6 bg-white shadow-md p-4 grid">
+                            <Sidebar userRole={userData.role_id} />
                         </div>
-                        <div className="basis-3/4 bg-white shadow-md">
+                        <div className="basis-5/6 bg-white shadow-md">
                             <div className="grid p-4 h-full">
                                 <div className="row-span-1 text-2xl font-bold pb-1 text-center flex border-b-2 sm:text-5xl">
                                     <div className="self-end mx-auto text-darkpurple tracking-wide">
